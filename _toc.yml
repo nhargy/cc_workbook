@@ -5,8 +5,17 @@
 format: jb-book
 root: main.md
 
+
+# =============== #
 chapters:
-- file: studies/lif10_gamma_response/main.md
-  title: lif10_gamma_response
+- file: pages/studies_hub.md
+  title: Studies
+  
   sections:
-    - file: studies/lif10_gamma_response/notebooks/analysis1.ipynb
+    - file: studies/lif10_gamma_response/main.md
+      title: lif10_gamma_response
+      sections:
+        - file: studies/lif10_gamma_response/notebooks/analysis1.ipynb
+
+- file: pages/literature_hub.md
+  title: Literature
