@@ -1,0 +1,12 @@
+
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: main.md
+
+chapters:
+- file: studies/lif10_gamma_response/docs/main.md
+  title: lif10_gamma_response
+  sections:
+    - file: studies/lif10_gamma_response/notebooks/analysis1.ipynb
