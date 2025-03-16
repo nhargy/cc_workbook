@@ -378,7 +378,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lif10-g1-experimental-structure">LiF10_G1 Experimental Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-notes">Setup Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#study-notes">Study Notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lif10-g1-experimental-structure">LiF10_G1 Experimental Structure</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -392,63 +396,26 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="lif10-g1-analysis-1">
 <h1>LiF10_G1 Analysis 1<a class="headerlink" href="#lif10-g1-analysis-1" title="Link to this heading">#</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
-<span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">electron_volt</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">configparser</span>
-
-<span class="c1"># Add project root (parent of notebooks/) to sys.path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
-
-<span class="kn">from</span> <span class="nn">src</span> <span class="kn">import</span> <span class="n">utils</span>  <span class="c1"># Import from the package</span>
-
-<span class="c1"># Set Seaborn style globally</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span> 
+<section id="setup-notes">
+<h2>Setup Notes<a class="headerlink" href="#setup-notes" title="Link to this heading">#</a></h2>
+<p>Please refer to the ‘global.ini’ file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">paths</span><span class="p">]</span>
+<span class="n">LOCAL_DATA_PATH</span><span class="o">=</span><span class="n">LOCAL_DATA_PATH</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
-<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;global.ini&#39;</span><span class="p">)</span>
-
-<span class="n">LOCAL_DATA_PATH</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">][</span><span class="s2">&quot;LOCAL_DATA_PATH&quot;</span><span class="p">]</span>
-
-<span class="c1"># Get the environment variable</span>
-<span class="n">LOCAL_DATA_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">LOCAL_DATA_PATH</span><span class="p">)</span>
-
-<span class="n">data1</span>           <span class="o">=</span> <span class="s2">&quot;LiF10_G1&quot;</span>
-<span class="n">data1_path</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LOCAL_DATA_PATH</span><span class="p">,</span> <span class="n">data1</span><span class="p">)</span> <span class="c1"># path/to/LiF10_G1 that is saved locally</span>
-
-<span class="n">sample_arr</span>      <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L102&quot;</span><span class="p">,</span> <span class="s2">&quot;L103&quot;</span><span class="p">,</span> <span class="s2">&quot;L104&quot;</span><span class="p">,</span> <span class="s2">&quot;L105&quot;</span><span class="p">]</span>
-<span class="n">colls</span>           <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
-
-<span class="n">t_exp</span>           <span class="o">=</span> <span class="mi">60</span>
-<span class="n">t_h2o</span>           <span class="o">=</span> <span class="mf">0.5</span>
-
-<span class="c1"># Energy of 445nm photon</span>
-<span class="n">photon_energy</span>     <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">445e-9</span><span class="p">)</span> <span class="c1"># joules </span>
-
-<span class="c1"># Photons per milli-joule of 445nm</span>
-<span class="n">photons_per_joule</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="o">/</span> <span class="n">photon_energy</span> <span class="c1"># just convert to milli-watts</span>
-
-<span class="c1"># Total power in photons per second</span>
-<span class="n">power</span> <span class="o">=</span> <span class="mf">12.4</span> <span class="c1"># mW</span>
-<span class="n">photons_per_sec</span>   <span class="o">=</span> <span class="n">power</span> <span class="o">*</span> <span class="n">photons_per_joule</span>
-</pre></div>
-</div>
-</div>
-</div>
+<p>The variable <code class="docutils literal notranslate"><span class="pre">LOCAL_DATA_PATH</span></code> should be the path to the directory in which the study data <code class="docutils literal notranslate"><span class="pre">LiF10_G1</span></code> directory is saved. <br />
+The raw data of <code class="docutils literal notranslate"><span class="pre">LiF10_G1</span></code> can be downloaded directly from: <a class="reference external" href="https://nhargy.github.io/">https://nhargy.github.io/</a> .</p>
+</section>
+<section id="study-notes">
+<h2>Study Notes<a class="headerlink" href="#study-notes" title="Link to this heading">#</a></h2>
+<p>4 sample 10x10x10mm LiF fluoride cubes (3 irrad and 1 ctrl) were successively irradiated with a Cobalt-60 source.</p>
+<p><strong>Objectives:</strong></p>
+<ul class="simple">
+<li><p>Estimate the minimum detectable signal, i.e. the the smallest gamma dose that is detectable through the system.</p></li>
+<li></li>
+</ul>
 <section id="lif10-g1-experimental-structure">
-<h2>LiF10_G1 Experimental Structure<a class="headerlink" href="#lif10-g1-experimental-structure" title="Link to this heading">#</a></h2>
+<h3>LiF10_G1 Experimental Structure<a class="headerlink" href="#lif10-g1-experimental-structure" title="Link to this heading">#</a></h3>
 <p>irrad -&gt; 1mCi (on Jan 2016) Co-60, centre of 1cm-cubed LiFs 40cm away from source.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -511,6 +478,61 @@ document.write(`
 </tr>
 </tbody>
 </table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+<span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">h</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">electron_volt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+
+<span class="c1"># Add project root (parent of notebooks/) to sys.path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+
+<span class="kn">from</span> <span class="nn">src</span> <span class="kn">import</span> <span class="n">utils</span>  <span class="c1"># Import from the package</span>
+
+<span class="c1"># Set Seaborn style globally</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;global.ini&#39;</span><span class="p">)</span>
+
+<span class="n">LOCAL_DATA_PATH</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">][</span><span class="s2">&quot;LOCAL_DATA_PATH&quot;</span><span class="p">]</span>
+
+<span class="c1"># Get the environment variable</span>
+<span class="n">LOCAL_DATA_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">LOCAL_DATA_PATH</span><span class="p">)</span>
+
+<span class="n">data1</span>           <span class="o">=</span> <span class="s2">&quot;LiF10_G1&quot;</span>
+<span class="n">data1_path</span>      <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LOCAL_DATA_PATH</span><span class="p">,</span> <span class="n">data1</span><span class="p">)</span> <span class="c1"># path/to/LiF10_G1 that is saved locally</span>
+
+<span class="n">sample_arr</span>      <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L102&quot;</span><span class="p">,</span> <span class="s2">&quot;L103&quot;</span><span class="p">,</span> <span class="s2">&quot;L104&quot;</span><span class="p">,</span> <span class="s2">&quot;L105&quot;</span><span class="p">]</span>
+<span class="n">colls</span>           <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+
+<span class="n">t_exp</span>           <span class="o">=</span> <span class="mi">60</span>
+<span class="n">t_h2o</span>           <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c1"># Energy of 445nm photon</span>
+<span class="n">photon_energy</span>     <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">445e-9</span><span class="p">)</span> <span class="c1"># joules </span>
+
+<span class="c1"># Photons per milli-joule of 445nm</span>
+<span class="n">photons_per_joule</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="o">/</span> <span class="n">photon_energy</span> <span class="c1"># just convert to milli-watts</span>
+
+<span class="c1"># Total power in photons per second</span>
+<span class="n">power</span> <span class="o">=</span> <span class="mf">12.4</span> <span class="c1"># mW</span>
+<span class="n">photons_per_sec</span>   <span class="o">=</span> <span class="n">power</span> <span class="o">*</span> <span class="n">photons_per_joule</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -586,11 +608,12 @@ document.write(`
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ~ 22 ph/sec</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ~ 22 ph/sec/min_of_gamma</span>
 </pre></div>
 </div>
 </div>
 </div>
+</section>
 </section>
 </section>
 
@@ -658,7 +681,11 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lif10-g1-experimental-structure">LiF10_G1 Experimental Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-notes">Setup Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#study-notes">Study Notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lif10-g1-experimental-structure">LiF10_G1 Experimental Structure</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
